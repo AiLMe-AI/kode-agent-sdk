@@ -97,19 +97,33 @@ export class AnthropicProvider implements ModelProvider {
     if (opts?.system) body.system = opts.system;
     if (opts?.tools && opts.tools.length > 0) body.tools = opts.tools;
 
-    const response = await fetch(`${this.baseUrl}/v1/messages`, {
+    const url = `${this.baseUrl}/v1/messages`;
+    const headers = {
+      'Content-Type': 'application/json',
+      'x-api-key': this.apiKey,
+      'anthropic-version': '2023-06-01',
+    };
+    const bodyJson = JSON.stringify(body);
+
+    // Debug logging for HTTP request
+    if (process.env.ANTHROPIC_LOG === 'debug') {
+      console.log('[Anthropic] POST', url);
+      console.log('[Anthropic] Headers:', JSON.stringify({ ...headers, 'x-api-key': '***REDACTED***' }, null, 2));
+      console.log('[Anthropic] Body:', bodyJson);
+    }
+
+    const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': this.apiKey,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify(body),
+      headers,
+      body: bodyJson,
     });
 
     if (!response.ok) {
       const error = await response.text();
-      throw new Error(`Anthropic API error: ${response.status} ${error}`);
+      if (process.env.ANTHROPIC_LOG === 'debug') {
+        console.log('[Anthropic] Error Response:', error);
+      }
+      throw new Error(`Anthropic API error: ${response.status}: ${error}`);
     }
 
     const data: any = await response.json();
@@ -141,19 +155,33 @@ export class AnthropicProvider implements ModelProvider {
     if (opts?.system) body.system = opts.system;
     if (opts?.tools && opts.tools.length > 0) body.tools = opts.tools;
 
-    const response = await fetch(`${this.baseUrl}/v1/messages`, {
+    const url = `${this.baseUrl}/v1/messages`;
+    const headers = {
+      'Content-Type': 'application/json',
+      'x-api-key': this.apiKey,
+      'anthropic-version': '2023-06-01',
+    };
+    const bodyJson = JSON.stringify(body);
+
+    // Debug logging for HTTP request
+    if (process.env.ANTHROPIC_LOG === 'debug') {
+      console.log('[Anthropic] POST (stream)', url);
+      console.log('[Anthropic] Headers:', JSON.stringify({ ...headers, 'x-api-key': '***REDACTED***' }, null, 2));
+      console.log('[Anthropic] Body:', bodyJson);
+    }
+
+    const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': this.apiKey,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify(body),
+      headers,
+      body: bodyJson,
     });
 
     if (!response.ok) {
       const error = await response.text();
-      throw new Error(`Anthropic API error: ${response.status} ${error}`);
+      if (process.env.ANTHROPIC_LOG === 'debug') {
+        console.log('[Anthropic] Error Response:', error);
+      }
+      throw new Error(`Anthropic API error: ${response.status}: ${error}`);
     }
 
     const reader = response.body?.getReader();

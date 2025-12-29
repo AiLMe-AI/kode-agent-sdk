@@ -1,5 +1,4 @@
 import { z, ZodType } from 'zod';
-import { zodToJsonSchema } from 'zod-to-json-schema';
 import { globalToolRegistry, ToolInstance, ToolDescriptor } from './registry';
 import { ToolContext } from '../core/types';
 import { Hooks } from '../core/hooks';
@@ -66,9 +65,9 @@ export function tool<TArgs = any, TResult = any>(
         }
       : nameOrDef;
 
-  // 生成 JSON Schema
+  // 生成 JSON Schema（使用 zod v4 内置方法）
   const input_schema = def.parameters
-    ? zodToJsonSchema(def.parameters, { target: 'openApi3', $refStrategy: 'none' })
+    ? z.toJSONSchema(def.parameters)
     : { type: 'object', properties: {} };
 
   // 创建工具实例
